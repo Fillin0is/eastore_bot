@@ -1,7 +1,5 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, InputMediaPhoto, FSInputFile
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher import FSMContext, State
 
 from keyboards.keyboards import inline_keyboard_regions_ps, inline_keyboard_functions_ps_turkey, inline_keyboard_main, inline_keyboard_calculate_ps_turkey
 
