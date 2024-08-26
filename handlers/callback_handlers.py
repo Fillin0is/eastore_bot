@@ -1,5 +1,7 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, InputMediaPhoto, FSInputFile
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher import FSMContext, State
 
 from keyboards.keyboards import inline_keyboard_regions_ps, inline_keyboard_functions_ps_turkey, inline_keyboard_main, inline_keyboard_calculate_ps_turkey
 
@@ -61,3 +63,15 @@ async def exit_to_region_menu(callback_query: CallbackQuery):
         reply_markup=inline_keyboard_regions_ps
     )
 
+@router.callback_query(F.data == 'turkey_ps_calculator_pressed')
+async def show_calculator_turkey_ps(callback_query: CallbackQuery):
+    await callback_query.answer()
+    await callback_query.message.edit_media(
+        media=InputMediaPhoto(
+            media=FSInputFile(
+                path='photo/turkey_exchange_rate.jpg'
+            ),
+            caption='Введите стоимость продукта:',
+        ),
+        reply_markup=inline_keyboard_calculate_ps_turkey
+    )
