@@ -1,6 +1,6 @@
 from aiogram import F, Router
-from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
+from aiogram.filters import Command
+from aiogram.types import Message, FSInputFile
 
 from lexicon.lexicon_ru import LEXICON_RU
 
@@ -9,14 +9,17 @@ from keyboards.keyboards import inline_keyboard_info, inline_keyboard_main
 router = Router()
 
 
-# Этот хэндлер срабатывает на команду /start
-@router.message(CommandStart())
+@router.message(Command(commands='start'))
 async def process_start_command(message: Message):
-    await message.answer(
-        text=LEXICON_RU['/start'],
-        markup=inline_keyboard_main
+    file_path = 'photo/store.jpg'
+    await message.bot.send_photo(
+        chat_id=message.chat.id,
+        photo=FSInputFile(
+            path=file_path
+        ),
+        caption=LEXICON_RU['/start'],
+        reply_markup=inline_keyboard_main
     )
-
     
 
 # Этот хэндлер срабатывает на команду /info
