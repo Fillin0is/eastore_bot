@@ -5,7 +5,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from config_data.config import Config, load_config
-from handlers import other_handlers, user_handlers, callback_handlers
+from handlers import other_handlers, user_handlers
+from handlers.callback_handlers import pc_callback_handlers, ps_callback_handlers, xbox_callback_handlers
 from keyboards.set_menu import set_main_menu
 
 # Инициализируем логгер
@@ -37,8 +38,10 @@ async def main():
     
     # Регистриуем роутеры в диспетчере
     dp.include_router(user_handlers.router)
+    dp.include_router(ps_callback_handlers.router)
+    dp.include_router(xbox_callback_handlers.router)
+    dp.include_router(pc_callback_handlers.router)
     dp.include_router(other_handlers.router)
-    dp.include_router(callback_handlers.router)
 
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)
