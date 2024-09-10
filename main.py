@@ -41,7 +41,7 @@ async def main():
     dp.include_router(ps_callback_handlers.router)
     dp.include_router(xbox_callback_handlers.router)
     dp.include_router(pc_callback_handlers.router)
-    dp.include_router(other_handlers.router)
+    dp.include_router(other_handlers.router)    
 
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)

@@ -14,12 +14,17 @@ router = Router(name=__name__)
 
 error_emojis = ['😕', '😞', '😟', '🙁', '😢', '😭', '😓', '😔', '😖', '😣']
 
-class PriceTurkeyPS(StatesGroup):
+class PriceTurkeyCalcPS(StatesGroup):
     amount = State()
 
-class PriceUkrainePS(StatesGroup):
+class PriceUkraineCalcPS(StatesGroup):
     amount = State()
 
+class PriceTurkeySentPS(StatesGroup):
+    amount = State()
+
+class PriceUkraineSentPS(StatesGroup):
+    amount = State()
 
 # ---------------------Playstation Store-------------------------
 
@@ -181,7 +186,7 @@ try:
             ),
             reply_markup=inline_keyboard_calculate_ps_turkey
         )
-        await state.set_state(PriceTurkeyPS.amount)
+        await state.set_state(PriceTurkeyCalcPS.amount)
         await callback_query.answer()
 except Exception as e:
     @router.message(Command(commands='start'))
@@ -230,7 +235,7 @@ except Exception as e:
 
 # калькулятор региона Турции PS store
 try:
-    @router.message(StateFilter(PriceTurkeyPS.amount))
+    @router.message(StateFilter(PriceTurkeyCalcPS.amount))
     async def ps_turkey_calculate(message: Message, bot: Bot, state: FSMContext):
         data = await state.get_data()
         
@@ -337,6 +342,116 @@ except Exception as e:
         await state.clear()
 
 
+# Меню пополнения Турецкого региона PS
+try:
+    @router.callback_query(F.data == 'turkey_sent_money_ps_pressed')
+    async def show_sent_money_turkey_ps(callback_query: CallbackQuery, state: FSMContext):
+        await callback_query.message.edit_media(
+            media=InputMediaPhoto(
+                media=FSInputFile(
+                    path='photo/sent_money.jpg'
+                ),
+                caption='Введите желаемое количество на пополнение в лирах (TL)',
+            ),
+            reply_markup=inline_keyboard_calculate_ps_turkey
+        )
+        await state.set_state(PriceTurkeySentPS.amount)
+        await callback_query.answer()
+except Exception as e:
+    @router.message(Command(commands='start'))
+    async def process_start_command(message: Message, state: FSMContext):
+        file_path = 'photo/store.jpg'
+        await message.bot.send_photo(
+            chat_id=message.chat.id,
+            photo=FSInputFile(
+                path=file_path
+            ),
+            caption=LEXICON_RU['/start'],
+            reply_markup=inline_keyboard_main
+        )
+        await state.clear()
+
+
+# Меню пополнения Турции (Steam), реакция на неправиьные сообщения
+try:
+    @router.message(StateFilter(PriceTurkeySentPS.amount))
+    async def ps_turkey_sent_money(message: Message, bot: Bot, state: FSMContext):
+        data = await state.get_data()
+        
+        if "message_id_calc" not in data.keys():
+            message_id_calc = message.message_id - 1
+            await state.update_data(message_id_calc=message_id_calc)
+        else:
+            message_id_calc = data["message_id_calc"]
+
+        # Получаем текущий индекс эмодзи или начинаем с 0
+        emoji_index = data.get("emoji_index", 0)
+
+        # Проверяем, является ли текст числом и больше ли он нуля
+        if message.text.isdigit() and int(message.text) > 0 and message.text[0] != '0':
+            amount = float(message.text)
+            try:
+                await bot.edit_message_media(
+                    chat_id=message.chat.id,
+                    message_id=message_id_calc,
+                    media=InputMediaPhoto(
+                        media=FSInputFile(
+                            path='photo/sent_money.jpg'
+                        ),
+                        caption=f'Сумма на пополнение = {get_rate_turkey(amount)} (₽)\n\nВведите желаемое количество на пополнение в лирах (TL)',
+                    ),
+                    reply_markup=inline_keyboard_calculate_ps_turkey
+                )
+                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            except Exception as e:
+                await bot.edit_message_media(
+                        chat_id=message.chat.id,
+                        message_id=message_id_calc,
+                        media=InputMediaPhoto(
+                            media=FSInputFile(
+                                path='photo/sent_money.jpg'
+                            ),
+                            caption=f'Сумма нa пополнение = {get_rate_turkey(amount)} (₽)\n\nВведите желаемое количество на пополнение в лирах (TL)',
+                        ),
+                        reply_markup=inline_keyboard_calculate_ps_turkey
+                    )
+                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        else:
+            # Выбираем эмодзи и обновляем индекс
+            current_emoji = error_emojis[emoji_index]
+            emoji_index = (emoji_index + 1) % len(error_emojis)
+            await state.update_data(emoji_index=emoji_index)
+
+            # Удаляем текущее сообщение с неправильным вводом
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            
+            # Отправляем сообщение с ошибкой и эмодзи
+            await bot.edit_message_media(
+                chat_id=message.chat.id,
+                message_id=message_id_calc,
+                media=InputMediaPhoto(
+                    media=FSInputFile(
+                        path='photo/sent_money.jpg'
+                    ),
+                    caption=f'Некорректно введено числовое значение на пополнение {current_emoji}\n\nВведите желаемое количество на пополнение в лирах (TL)',
+                ),
+                reply_markup=inline_keyboard_calculate_ps_turkey
+            )
+except Exception as e:
+    @router.message(Command(commands='start'))
+    async def process_start_command(message: Message, state: FSMContext):
+        file_path = 'photo/store.jpg'
+        await message.bot.send_photo(
+            chat_id=message.chat.id,
+            photo=FSInputFile(
+                path=file_path
+            ),
+            caption=LEXICON_RU['/start'],
+            reply_markup=inline_keyboard_main
+        )
+        await state.clear()
+
+
 # -----------------Украинский регион PlayStation----------------------------
 
 # Меню выбора региона Украины на Playstation
@@ -411,7 +526,7 @@ try:
             ),
             reply_markup=inline_keyboard_calculate_ps_ukraine
         )
-        await state.set_state(PriceUkrainePS.amount)
+        await state.set_state(PriceUkraineCalcPS.amount)
         await callback_query.answer()
 except Exception as e:
     @router.message(Command(commands='start'))
@@ -430,7 +545,7 @@ except Exception as e:
 
 # Изменненное состояние калькулятор Украинского PS store
 try:
-    @router.message(StateFilter(PriceUkrainePS.amount))
+    @router.message(StateFilter(PriceUkraineCalcPS.amount))
     async def ps_ukraine_calculate(message: Message, bot: Bot, state: FSMContext):
         data = await state.get_data()
         
@@ -551,6 +666,116 @@ try:
             reply_markup=inline_keyboard_calculate_ps_ukraine
         )
         await callback_query.answer()
+except Exception as e:
+    @router.message(Command(commands='start'))
+    async def process_start_command(message: Message, state: FSMContext):
+        file_path = 'photo/store.jpg'
+        await message.bot.send_photo(
+            chat_id=message.chat.id,
+            photo=FSInputFile(
+                path=file_path
+            ),
+            caption=LEXICON_RU['/start'],
+            reply_markup=inline_keyboard_main
+        )
+        await state.clear()
+
+
+# Меню пополнения Украинского региона PS
+try:
+    @router.callback_query(F.data == 'ukraine_ps_sent_money_pressed')
+    async def show_sent_money_ukraine_ps(callback_query: CallbackQuery, state: FSMContext):
+        await callback_query.message.edit_media(
+            media=InputMediaPhoto(
+                media=FSInputFile(
+                    path='photo/sent_money.jpg'
+                ),
+                caption='Введите желаемое количество на пополнение в гривнах (UAH)',
+            ),
+            reply_markup=inline_keyboard_calculate_ps_ukraine
+        )
+        await state.set_state(PriceUkraineSentPS.amount)
+        await callback_query.answer()
+except Exception as e:
+    @router.message(Command(commands='start'))
+    async def process_start_command(message: Message, state: FSMContext):
+        file_path = 'photo/store.jpg'
+        await message.bot.send_photo(
+            chat_id=message.chat.id,
+            photo=FSInputFile(
+                path=file_path
+            ),
+            caption=LEXICON_RU['/start'],
+            reply_markup=inline_keyboard_main
+        )
+        await state.clear()
+
+
+# Меню пополнения Украины (PS), реакция на неправиьные сообщения
+try:
+    @router.message(StateFilter(PriceUkraineSentPS.amount))
+    async def ps_ukraine_sent_money(message: Message, bot: Bot, state: FSMContext):
+        data = await state.get_data()
+        
+        if "message_id_calc" not in data.keys():
+            message_id_calc = message.message_id - 1
+            await state.update_data(message_id_calc=message_id_calc)
+        else:
+            message_id_calc = data["message_id_calc"]
+
+        # Получаем текущий индекс эмодзи или начинаем с 0
+        emoji_index = data.get("emoji_index", 0)
+
+        # Проверяем, является ли текст числом и больше ли он нуля
+        if message.text.isdigit() and int(message.text) > 0 and message.text[0] != '0':
+            amount = float(message.text)
+            try:
+                await bot.edit_message_media(
+                    chat_id=message.chat.id,
+                    message_id=message_id_calc,
+                    media=InputMediaPhoto(
+                        media=FSInputFile(
+                            path='photo/sent_money.jpg'
+                        ),
+                        caption=f'Сумма на пополнение = {get_rate_ukraine(amount)} (₽)\n\nВведите желаемое количество на пополнение в гривнах (UAH)',
+                    ),
+                    reply_markup=inline_keyboard_calculate_ps_ukraine
+                )
+                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            except Exception as e:
+                await bot.edit_message_media(
+                        chat_id=message.chat.id,
+                        message_id=message_id_calc,
+                        media=InputMediaPhoto(
+                            media=FSInputFile(
+                                path='photo/sent_money.jpg'
+                            ),
+                            caption=f'Сумма нa пополнение = {get_rate_ukraine(amount)} (₽)\n\nВведите желаемое количество на пополнение в гривнах (UAH)',
+                        ),
+                        reply_markup=inline_keyboard_calculate_ps_ukraine
+                    )
+                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        else:
+            # Выбираем эмодзи и обновляем индекс
+            current_emoji = error_emojis[emoji_index]
+            emoji_index = (emoji_index + 1) % len(error_emojis)
+            await state.update_data(emoji_index=emoji_index)
+
+            # Удаляем текущее сообщение с неправильным вводом
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            
+            # Отправляем сообщение с ошибкой и эмодзи
+            await bot.edit_message_media(
+                chat_id=message.chat.id,
+                message_id=message_id_calc,
+                media=InputMediaPhoto(
+                    media=FSInputFile(
+                        path='photo/sent_money.jpg'
+                    ),
+                    caption=f'Некорректно введено числовое значение на пополнение {current_emoji}\n\nВведите желаемое количество на пополнение в гривнах (UAH)',
+                ),
+                reply_markup=inline_keyboard_calculate_ps_ukraine
+            )
 except Exception as e:
     @router.message(Command(commands='start'))
     async def process_start_command(message: Message, state: FSMContext):
