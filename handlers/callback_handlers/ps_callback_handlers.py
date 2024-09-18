@@ -8,7 +8,7 @@ from aiogram.types import Message
 
 from lexicon.lexicon_ru import LEXICON_GAME_RU, LEXICON_RU
 from services.services import get_rate_turkey, get_rate_ukraine
-from keyboards.keyboards import inline_keyboard_regions_ps, inline_keyboard_functions_ps_turkey, inline_keyboard_main, inline_keyboard_calculate_ps_turkey, inline_keyboard_functions_ps_ukraine, inline_keyboard_calculate_ps_ukraine, inline_keyboard_functions_ps_india, inline_keyboard_exit_ps_india
+from keyboards.keyboards import inline_keyboard_regions_ps, inline_keyboard_functions_ps_turkey, inline_keyboard_main, inline_keyboard_calculate_ps_turkey, inline_keyboard_functions_ps_ukraine, inline_keyboard_calculate_ps_ukraine
 
 router = Router(name=__name__)
 
@@ -776,125 +776,6 @@ try:
                 ),
                 reply_markup=inline_keyboard_calculate_ps_ukraine
             )
-except Exception as e:
-    @router.message(Command(commands='start'))
-    async def process_start_command(message: Message, state: FSMContext):
-        file_path = 'photo/store.jpg'
-        await message.bot.send_photo(
-            chat_id=message.chat.id,
-            photo=FSInputFile(
-                path=file_path
-            ),
-            caption=LEXICON_RU['/start'],
-            reply_markup=inline_keyboard_main
-        )
-        await state.clear()
-
-# ---------------------------------------------------------------------------------------
-# ---------------------------Индийский регион PlayStation--------------------------------
-
-# Меню категорий индийского региона PlayStation
-try:
-    @router.callback_query(F.data.in_(['india_ps_pressed', 'exit_function_ps_india_pressed']))
-    async def show_fanctions_ps_india(callback_query: CallbackQuery, state: FSMContext):
-        await callback_query.message.edit_media(
-            media=InputMediaPhoto(
-                media=FSInputFile(
-                    path='photo/ps_india_flag.jpg'
-                ), 
-                caption='Выберите категорию:',
-            ),
-            reply_markup=inline_keyboard_functions_ps_india
-        )
-        await state.set_state(default_state)
-        await callback_query.answer()
-except Exception as e:
-    @router.message(Command(commands='start'))
-    async def process_start_command(message: Message, state: FSMContext):
-        file_path = 'photo/store.jpg'
-        await message.bot.send_photo(
-            chat_id=message.chat.id,
-            photo=FSInputFile(
-                path=file_path
-            ),
-            caption=LEXICON_RU['/start'],
-            reply_markup=inline_keyboard_main
-        )
-        await state.clear()
-
-
-# Меню топа игр Индии на Playstation
-try:
-    @router.callback_query(F.data == 'india_buy_ps_pressed')
-    async def show_game_top_india(callback_query: CallbackQuery):
-        await callback_query.message.edit_media(
-            media=InputMediaPhoto(
-                media=FSInputFile(
-                    path='photo/fc25.jpg'
-                ), 
-                caption=LEXICON_GAME_RU['game_ps_india']
-            ),
-            reply_markup=inline_keyboard_exit_ps_india
-        )
-        await callback_query.answer()
-except Exception as e:
-    @router.message(Command(commands='start'))
-    async def process_start_command(message: Message, state: FSMContext):
-        file_path = 'photo/store.jpg'
-        await message.bot.send_photo(
-            chat_id=message.chat.id,
-            photo=FSInputFile(
-                path=file_path
-            ),
-            caption=LEXICON_RU['/start'],
-            reply_markup=inline_keyboard_main
-        )
-        await state.clear()
-
-
-# Подписки Индии на Playstation
-try:
-    @router.callback_query(F.data == 'india_ps_sub_pressed')
-    async def show_sub_india(callback_query: CallbackQuery):
-        await callback_query.message.edit_media(
-            media=InputMediaPhoto(
-                media=FSInputFile(
-                    path='photo/ps_sub_india.jpg'
-                ), 
-                caption=''
-            ),
-            reply_markup=inline_keyboard_exit_ps_india
-        )
-        await callback_query.answer()
-except Exception as e:
-    @router.message(Command(commands='start'))
-    async def process_start_command(message: Message, state: FSMContext):
-        file_path = 'photo/store.jpg'
-        await message.bot.send_photo(
-            chat_id=message.chat.id,
-            photo=FSInputFile(
-                path=file_path
-            ),
-            caption=LEXICON_RU['/start'],
-            reply_markup=inline_keyboard_main
-        )
-        await state.clear()
-
-
-# Пополнение кошелька Индия на Playstation
-try:
-    @router.callback_query(F.data == 'india_ps_sent_money_pressed')
-    async def show_sub_india(callback_query: CallbackQuery):
-        await callback_query.message.edit_media(
-            media=InputMediaPhoto(
-                media=FSInputFile(
-                    path='photo/ps_sent_money_india.jpg'
-                ), 
-                caption=''
-            ),
-            reply_markup=inline_keyboard_exit_ps_india
-        )
-        await callback_query.answer()
 except Exception as e:
     @router.message(Command(commands='start'))
     async def process_start_command(message: Message, state: FSMContext):

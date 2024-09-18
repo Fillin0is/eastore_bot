@@ -75,17 +75,12 @@ ukraine_ps_button = InlineKeyboardButton(
     callback_data='ukraine_ps_pressed'
 )
 
-india_ps_button = InlineKeyboardButton(
-    text='Индия',
-    callback_data='india_ps_pressed'
-)
-
 exit_button = InlineKeyboardButton(
     text='<< Назад',
     callback_data='exit_main_pressed'
 )
 
-ps_regions = [[turkey_ps_button], [ukraine_ps_button], [india_ps_button], [exit_button]]
+ps_regions = [[turkey_ps_button], [ukraine_ps_button], [exit_button]]
 
 inline_keyboard_regions_ps = InlineKeyboardMarkup(inline_keyboard=ps_regions)
 
@@ -119,10 +114,6 @@ exit_ps_region_button = InlineKeyboardButton(
 turkey_functions = [[turkey_game_ps_button, ps_turkey_region], [turkey_money_button, turkey_ps_sub_button], [turkey_calculator_button], [exit_ps_region_button]]
 
 inline_keyboard_functions_ps_turkey = InlineKeyboardMarkup(inline_keyboard=turkey_functions)
-
-# ------------------------------------------------
-
-
 
 # ------------------------------------------------
 
@@ -171,38 +162,6 @@ exit_function_ps_ukraine_button = InlineKeyboardButton(
 calculation_ps_ukraine = [[tg_admin_button], [exit_function_ps_ukraine_button]]
 
 inline_keyboard_calculate_ps_ukraine = InlineKeyboardMarkup(inline_keyboard=calculation_ps_ukraine)
-
-# ----------------------------------------------
-
-india_ps_game_button = InlineKeyboardButton(
-    text='Игры',
-    callback_data='india_buy_ps_pressed'
-)
-
-india_ps_sub_button = InlineKeyboardButton(
-    text='Подписки',
-    callback_data='india_ps_sub_pressed'
-)
-
-india_ps_money_button = InlineKeyboardButton(
-    text='Пополнение кошелька',
-    callback_data='india_ps_sent_money_pressed'
-)
-
-india_ps_functions = [[india_ps_game_button, ps_india_region], [india_ps_sub_button, india_ps_money_button], [exit_ps_region_button]]
-
-inline_keyboard_functions_ps_india = InlineKeyboardMarkup(inline_keyboard=india_ps_functions)
-
-# ------------------------------------------------
-
-exit_function_ps_india_button = InlineKeyboardButton(
-    text='<< Назад',
-    callback_data='exit_function_ps_india_pressed'
-)
-
-calculation_ps_india = [[tg_admin_button], [exit_function_ps_india_button]]
-
-inline_keyboard_exit_ps_india = InlineKeyboardMarkup(inline_keyboard=calculation_ps_india)
 
 # ------------------------------------------------------------------------------------
 # -----------------------------MicrosoftStore (Xbox)----------------------------------
