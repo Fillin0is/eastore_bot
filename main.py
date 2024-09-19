@@ -13,7 +13,7 @@ from keyboards.set_menu import set_main_menu
 logger = logging.getLogger(__name__)
 
 
-# Функция конфигурирования и запуска бота
+# Функция конфигурирcdования и запуска бота
 async def main():
     # Конфигурируем логирование
     logging.basicConfig(

@@ -30,7 +30,7 @@ try:
         await callback_query.message.edit_media(
             media=InputMediaPhoto(
                 media=FSInputFile(
-                    path='photo/steam_region_photo.png'
+                    path='photo/steam_region_photo.PNG'
                 ),  # Используйте InputMediaPhoto
                 caption='Выберите регион:',
             ),

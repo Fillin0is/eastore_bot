@@ -152,7 +152,7 @@ try:
         await callback_query.message.edit_media(
             media=InputMediaPhoto(
                 media=FSInputFile(
-                    path='photo/ps_region_photo.png'
+                    path='photo/ps_region_photo.PNG'
                 ),
                 caption='Выберите регион:',
             ),
